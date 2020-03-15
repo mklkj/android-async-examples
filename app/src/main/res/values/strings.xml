@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">android-async-examples</string>
+    <string name="app_name">Android async examples</string>
+    <string name="refresh">Refresh</string>
+    <string name="not_loaded">Not loaded</string>
 </resources>
