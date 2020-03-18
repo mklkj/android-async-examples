@@ -28,12 +28,12 @@ class AsyncTaskFragment : Fragment() {
         startAsyncTask()
 
         buttonRefresh.setOnClickListener {
+            asyncTask?.cancel(true)
             startAsyncTask()
         }
     }
 
     private fun startAsyncTask() {
-        asyncTask?.cancel(true)
         asyncTask = OurAsyncTask(this).apply {
             execute(URL("https://httpbin.org/anything/android-async-examples"))
         }

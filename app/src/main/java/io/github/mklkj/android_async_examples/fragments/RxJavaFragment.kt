@@ -16,6 +16,8 @@ import java.net.URL
 
 class RxJavaFragment : Fragment() {
 
+    private val disposable = CompositeDisposable()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_example, container, false)
     }
@@ -26,11 +28,10 @@ class RxJavaFragment : Fragment() {
         startAsyncTask()
 
         buttonRefresh.setOnClickListener {
+            disposable.clear()
             startAsyncTask()
         }
     }
-
-    private val disposable = CompositeDisposable()
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -43,12 +44,14 @@ class RxJavaFragment : Fragment() {
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 textResult.text = getString(R.string.loading)
+                Log.i("RxJavaFragment", "loading was started")
             }
             .subscribe({
                 textResult.text = it
+                Log.i("RxJavaFragment", "loading completed")
             }, {
-                Log.e("RxJavaFragment", it.message, it)
                 textResult.text = it.message
+                Log.e("RxJavaFragment", "loading error: ${it.message}", it)
             }))
     }
 }
