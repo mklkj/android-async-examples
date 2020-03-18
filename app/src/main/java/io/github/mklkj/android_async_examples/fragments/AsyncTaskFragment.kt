@@ -10,16 +10,15 @@ import androidx.fragment.app.Fragment
 import io.github.mklkj.android_async_examples.R
 import kotlinx.android.synthetic.main.fragment_example.*
 import java.io.IOException
+import java.lang.Thread.sleep
 import java.lang.ref.WeakReference
 import java.net.URL
 
 class AsyncTaskFragment : Fragment() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    private var asyncTask: OurAsyncTask? = null
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_example, container, false)
     }
 
@@ -34,29 +33,48 @@ class AsyncTaskFragment : Fragment() {
     }
 
     private fun startAsyncTask() {
-        OurAsyncTask(this).execute(URL("https://httpbin.org/anything/android-async-examples"))
+        asyncTask?.cancel(true)
+        asyncTask = OurAsyncTask(this).apply {
+            execute(URL("https://httpbin.org/anything/android-async-examples"))
+        }
     }
 
-    private class OurAsyncTask internal constructor(fragment: AsyncTaskFragment) :
-        AsyncTask<URL, Int, String>() {
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        asyncTask?.cancel(true)
+    }
+
+    private class OurAsyncTask internal constructor(fragment: AsyncTaskFragment) : AsyncTask<URL, Int, String>() {
 
         private val fragmentRef: WeakReference<AsyncTaskFragment> = WeakReference(fragment)
 
         override fun onPreExecute() {
             fragmentRef.get()?.textResult?.text = fragmentRef.get()?.getString(R.string.loading)
+            Log.i("AsyncTaskFragment", "OurAsyncTask was started")
         }
 
         override fun doInBackground(vararg params: URL): String {
             return try {
+                sleep(2000)
                 makeRequestAndReturnResponse(params[0])
             } catch (e: IOException) {
-                Log.e("AsyncTaskFragment", e.message, e)
+                Log.e("AsyncTaskFragment", "OurAsyncTask error: ${e.message}", e)
                 e.message.orEmpty()
             }
         }
 
         override fun onPostExecute(result: String) {
             fragmentRef.get()?.textResult?.text = result
+            Log.i("AsyncTaskFragment", "OurAsyncTask was completed")
+        }
+
+        override fun onCancelled() {
+            Log.e("AsyncTaskFragment", "OurAsyncTask was cancelled")
+        }
+
+        override fun onCancelled(result: String?) {
+            Log.e("AsyncTaskFragment", "OurAsyncTask was cancelled with result: $result")
         }
     }
 }
