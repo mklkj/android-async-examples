@@ -56,7 +56,6 @@ class AsyncTaskFragment : Fragment() {
 
         override fun doInBackground(vararg params: URL): String {
             return try {
-                sleep(2000)
                 makeRequestAndReturnResponse(params[0])
             } catch (e: IOException) {
                 Log.e("AsyncTaskFragment", "OurAsyncTask error: ${e.message}", e)

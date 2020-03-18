@@ -6,6 +6,8 @@ import java.net.URL
 
 // just request example using HttpURLConnection. Use e.g. okHttp instead
 fun makeRequestAndReturnResponse(url: URL): String {
+    Thread.sleep(2000)
+
     val output: String
 
     val connection = url.openConnection() as HttpURLConnection
