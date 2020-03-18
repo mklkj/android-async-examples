@@ -37,7 +37,6 @@ class AsyncTaskFragment : Fragment() {
         }
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         asyncTask?.cancel(true)
