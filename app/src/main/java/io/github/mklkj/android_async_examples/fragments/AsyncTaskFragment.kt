@@ -9,8 +9,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import io.github.mklkj.android_async_examples.R
 import kotlinx.android.synthetic.main.fragment_example.*
-import java.io.IOException
-import java.lang.Thread.sleep
 import java.lang.ref.WeakReference
 import java.net.URL
 
@@ -57,7 +55,7 @@ class AsyncTaskFragment : Fragment() {
         override fun doInBackground(vararg params: URL): String {
             return try {
                 makeRequestAndReturnResponse(params[0])
-            } catch (e: IOException) {
+            } catch (e: Throwable) {
                 Log.e("AsyncTaskFragment", "OurAsyncTask error: ${e.message}", e)
                 e.message.orEmpty()
             }

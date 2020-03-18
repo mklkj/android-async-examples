@@ -39,7 +39,14 @@ class RxJavaFragment : Fragment() {
     }
 
     private fun startAsyncTask() {
-        disposable.add(Single.fromCallable { makeRequestAndReturnResponse(URL("https://httpbin.org/anything/android-async-examples")) }
+        disposable.add(Single.create<String> { emitter ->
+                try {
+                    emitter.onSuccess(makeRequestAndReturnResponse(URL("https://httpbin.org/anything/android-async-examples")))
+                } catch (e: Throwable) {
+                    Log.e("RxJavaFragment", "emitter throws error: ${e.message}", e)
+                    if (!emitter.isDisposed) emitter.onError(e)
+                }
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
