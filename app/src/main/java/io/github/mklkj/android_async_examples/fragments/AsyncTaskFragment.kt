@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import io.github.mklkj.android_async_examples.R
 import kotlinx.android.synthetic.main.fragment_example.*
 import java.io.IOException
+import java.lang.ref.WeakReference
 import java.net.URL
 
 class AsyncTaskFragment : Fragment() {
@@ -33,13 +34,16 @@ class AsyncTaskFragment : Fragment() {
     }
 
     private fun startAsyncTask() {
-        OurAsyncTask().execute(URL("https://httpbin.org/anything/android-async-examples"))
+        OurAsyncTask(this).execute(URL("https://httpbin.org/anything/android-async-examples"))
     }
 
-    inner class OurAsyncTask : AsyncTask<URL, Int, String>() {
+    private class OurAsyncTask internal constructor(fragment: AsyncTaskFragment) :
+        AsyncTask<URL, Int, String>() {
+
+        private val fragmentRef: WeakReference<AsyncTaskFragment> = WeakReference(fragment)
 
         override fun onPreExecute() {
-            textResult.text = getString(R.string.loading)
+            fragmentRef.get()?.textResult?.text = fragmentRef.get()?.getString(R.string.loading)
         }
 
         override fun doInBackground(vararg params: URL): String {
@@ -52,7 +56,7 @@ class AsyncTaskFragment : Fragment() {
         }
 
         override fun onPostExecute(result: String) {
-            textResult.text = result
+            fragmentRef.get()?.textResult?.text = result
         }
     }
 }
